@@ -1,5 +1,5 @@
-function normalize(text) {
-  return text.replace(/[\s　、。・「」『』【】\[\]()（）\-–—:：]/g, "").toLowerCase();
+function normalize(title) {
+  return title.replace(/[\s　、。・「」『』【】\[\]()（）\-–—:：]/g, "").toLowerCase();
 }
 
 function bigrams(s) {
@@ -17,19 +17,15 @@ function jaccardSimilarity(a, b) {
 }
 
 /**
- * テキストの2-gram Jaccard類似度で似ているものを1グループにまとめ、
- * 各グループの代表1件だけを返す汎用関数。
- *
- * @param {Array} items
- * @param {(item) => string} getText - 類似度比較に使うテキストを取り出す関数
- * @param {(a, b) => boolean} isBetter - bよりaを代表として優先すべきか
- * @param {number} threshold - この値以上のJaccard類似度を同一とみなす
+ * タイトルの文字列レベルでの重複(同一記事の転載・ほぼ同じ見出し)をまとめる。
+ * 表現が異なる同一トピックの統合はenrich.js側のGeminiオーケストレーションで行うため、
+ * ここでは閾値を高めに取り、明らかな同一記事だけを対象とする。
  */
-export function clusterBySimilarText(items, getText, isBetter, threshold) {
+export function dedupeArticles(articles, threshold = 0.75) {
   const groups = [];
 
-  for (const item of items) {
-    const grams = bigrams(normalize(getText(item)));
+  for (const article of articles) {
+    const grams = bigrams(normalize(article.title));
     let matchedGroup = null;
 
     for (const group of groups) {
@@ -40,28 +36,14 @@ export function clusterBySimilarText(items, getText, isBetter, threshold) {
     }
 
     if (matchedGroup) {
-      if (isBetter(item, matchedGroup.representative)) {
-        matchedGroup.representative = item;
+      if (article.isOfficial && !matchedGroup.representative.isOfficial) {
+        matchedGroup.representative = article;
         matchedGroup.representativeGrams = grams;
       }
     } else {
-      groups.push({ representative: item, representativeGrams: grams });
+      groups.push({ representative: article, representativeGrams: grams });
     }
   }
 
   return groups.map((g) => g.representative);
-}
-
-/**
- * 同じ話題を扱う記事を1件にまとめる(FR-02)。
- * タイトルの2-gram Jaccard類似度が閾値以上のものを重複とみなし、
- * isOfficial を優先、次点は先に見つかった記事を代表として残す。
- */
-export function dedupeArticles(articles, threshold = 0.6) {
-  return clusterBySimilarText(
-    articles,
-    (a) => a.title,
-    (candidate, current) => candidate.isOfficial && !current.isOfficial,
-    threshold
-  );
 }
