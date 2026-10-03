@@ -1,0 +1,15 @@
+{
+  "name": "hitachi-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "日立製作所 ニュース・株価ダイジェストアプリ",
+  "type": "module",
+  "scripts": {
+    "collect": "node scripts/run-daily.js",
+    "build-site": "node scripts/build-site.js"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.11.2",
+    "js-yaml": "^4.1.0"
+  }
+}

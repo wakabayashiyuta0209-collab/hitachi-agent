@@ -1,0 +1,21 @@
+companies:
+  - name: "日立製作所"
+    ticker: "6501.jp"
+    newsKeywords:
+      - "日立製作所"
+    officialDomains:
+      - "hitachi.co.jp"
+      - "hitachi.com"
+    # PR TIMESの発信元企業名がこれに一致する場合、一次情報(公式発表)として扱う
+    prTimesOfficialNames:
+      - "株式会社 日立製作所"
+      - "株式会社日立製作所"
+      - "日立製作所"
+
+schedule:
+  cron: "0 22 * * 0-4" # UTC。JST 07:00(月〜金)相当
+  timezone: "Asia/Tokyo"
+
+notification:
+  toEmail: "wakabayashi.yuta.0209@gmail.com"
+  fromName: "日立ダイジェスト"

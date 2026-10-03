@@ -1,0 +1,350 @@
+:root {
+  --bg: #f3ecff;
+  --text: #4a4458;
+  --page-font: "Zen Maru Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --tile-radius: 16px;
+  --tile-shadow: 0 12px 24px rgba(150, 130, 200, .28);
+  --overlay-grad: linear-gradient(to top, rgba(40, 28, 56, .92) 0%, rgba(40, 28, 56, .55) 32%, rgba(40, 28, 56, 0) 62%);
+  --overlay-grad-top: linear-gradient(to bottom, rgba(40, 28, 56, .45) 0%, rgba(40, 28, 56, 0) 28%);
+  --badge-radius: 999px;
+  --badge-bg: rgba(255, 255, 255, .9);
+  --badge-text: #7a5ea8;
+  --cap-font: "Zen Maru Gothic";
+  --cap-weight: 700;
+  --img-filter: saturate(1.05) brightness(1.05) contrast(.95);
+  --accent: #ff9ecb;
+  --stock-up: #3dbf6f;
+  --stock-down: #e2604f;
+  --stock-up-bg: #7CFFA0;
+  --stock-down-bg: #FF9B9B;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--page-font);
+}
+
+.page-header {
+  position: relative;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 34px 18px 22px;
+  overflow: hidden;
+}
+
+.header-deco {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.deco-blob {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.deco-blob.b1 {
+  width: 130px;
+  height: 130px;
+  top: -46px;
+  right: -24px;
+  background: radial-gradient(circle at 32% 30%, #ffd1e8 0%, #ff9ecb 65%, rgba(255, 158, 203, 0) 100%);
+  opacity: .6;
+}
+
+.deco-blob.b2 {
+  width: 90px;
+  height: 90px;
+  bottom: -40px;
+  left: -20px;
+  background: radial-gradient(circle at 32% 30%, #e3d4ff 0%, #b79bea 65%, rgba(183, 155, 234, 0) 100%);
+  opacity: .55;
+}
+
+.deco-blob.b3 {
+  width: 44px;
+  height: 44px;
+  top: 10px;
+  left: 58%;
+  background: radial-gradient(circle at 32% 30%, #d4f7e4 0%, #8fe0b4 65%, rgba(143, 224, 180, 0) 100%);
+  opacity: .6;
+}
+
+.deco-spark {
+  position: absolute;
+  width: 128px;
+  height: auto;
+  right: 6px;
+  bottom: 2px;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: .01em;
+}
+
+.page-header h1 .accent {
+  color: #9b7fd1;
+}
+
+.header-tagline {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  opacity: .6;
+}
+
+.grid {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 8px 14px 40px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 176px;
+  grid-auto-flow: dense;
+  gap: 7px;
+}
+
+.tile {
+  position: relative;
+  border-radius: var(--tile-radius);
+  overflow: hidden;
+  box-shadow: var(--tile-shadow);
+  cursor: pointer;
+  background: #d9cdf0;
+  isolation: isolate;
+}
+
+.tile.sq { grid-column: span 1; grid-row: span 1; }
+.tile.wide { grid-column: span 2; grid-row: span 1; }
+.tile.tall { grid-column: span 1; grid-row: span 2; }
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.bg.photo {
+  background-size: cover;
+  background-position: center;
+  filter: var(--img-filter);
+}
+
+/* 出典サイトごとに色味がバラバラな写真を、ページ全体のトーンへ馴染ませる統一フィルム */
+.bg.photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(160deg, rgba(167, 140, 219, .4), rgba(74, 68, 88, .32));
+  mix-blend-mode: soft-light;
+}
+
+.bg.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: var(--overlay-grad-top), var(--overlay-grad);
+}
+
+.bg.placeholder {
+  /* 文字の視認性を優先し、カテゴリによらずグレー系で統一する */
+  background: linear-gradient(160deg, #8d8696, #5c5566);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bg.placeholder::before {
+  content: attr(data-icon);
+  font-size: 64px;
+  line-height: 1;
+  opacity: .4;
+  filter: grayscale(.4) brightness(1.3);
+  transform: rotate(-8deg);
+}
+
+.tile.wide .bg.placeholder::before,
+.tile.tall .bg.placeholder::before { font-size: 84px; }
+
+/* カテゴリごとの差はグレーの濃淡のみ(文字コントラストを損なわない範囲) */
+.tile[data-cat="keiei"] .bg.placeholder { background: linear-gradient(160deg, #938a8a, #5c5252); }
+.tile[data-cat="teikei"] .bg.placeholder { background: linear-gradient(160deg, #828c99, #4f5661); }
+.tile[data-cat="touhaigo"] .bg.placeholder { background: linear-gradient(160deg, #8b8699, #58546b); }
+.tile[data-cat="senshin"] .bg.placeholder { background: linear-gradient(160deg, #849289, #4e5950); }
+.tile[data-cat="jinji"] .bg.placeholder { background: linear-gradient(160deg, #988792, #5f4f5a); }
+.tile[data-cat="sonota"] .bg.placeholder { background: linear-gradient(160deg, #8d8696, #5c5566); }
+
+.bg.placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--overlay-grad-top), linear-gradient(to top, rgba(20, 16, 26, .65) 0%, rgba(20, 16, 26, 0) 55%);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--badge-radius);
+}
+
+.press-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(74, 68, 88, .55);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--badge-radius);
+  margin-top: 26px;
+}
+
+.tile .badge + .press-label { top: 40px; }
+
+.new-chip {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: var(--badge-radius);
+}
+
+.cap {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  z-index: 2;
+  color: #fff;
+  font-family: var(--cap-font);
+  font-weight: var(--cap-weight);
+  font-size: 14px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .55), 0 1px 12px rgba(0, 0, 0, .35);
+}
+
+.tile.sq .cap { -webkit-line-clamp: 3; }
+.tile.wide .cap { -webkit-line-clamp: 2; }
+.tile.tall .cap { -webkit-line-clamp: 7; }
+
+/* 既読(状態修飾、パターン非依存) */
+.tile.is-seen {
+  filter: grayscale(.55) brightness(.8);
+  opacity: .62;
+}
+.tile.is-seen .new-chip { display: none; }
+
+/* 株価タイル */
+.tile.stock {
+  background: linear-gradient(160deg, #3a3350, #4a4458);
+}
+
+.tile.stock::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: var(--overlay-grad-top), linear-gradient(to top, rgba(18, 14, 26, .8) 0%, rgba(18, 14, 26, .25) 42%, rgba(18, 14, 26, 0) 68%);
+}
+
+.stock-chart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.stock-chart path.line {
+  fill: none;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+.tile.stock.up .stock-chart path.line { stroke: var(--stock-up-bg); }
+.tile.stock.down .stock-chart path.line { stroke: var(--stock-down-bg); }
+
+.stock-chart path.area {
+  stroke: none;
+  opacity: .25;
+}
+.tile.stock.up .stock-chart path.area { fill: var(--stock-up-bg); }
+.tile.stock.down .stock-chart path.area { fill: var(--stock-down-bg); }
+
+.tile.stock .cap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  -webkit-line-clamp: unset;
+}
+.tile.stock .cap .name { font-size: 12px; font-weight: 700; opacity: .85; }
+.tile.stock .cap .price { font-size: 22px; font-weight: 900; }
+.tile.stock .cap .chg { font-size: 13px; font-weight: 700; }
+.tile.stock.up .cap .chg { color: var(--stock-up-bg); }
+.tile.stock.down .cap .chg { color: var(--stock-down-bg); }
+
+/* 株価が大きく動いた日(FR-07)の目立つ演出 */
+.tile.stock.significant-move {
+  box-shadow: 0 0 0 3px var(--accent), var(--tile-shadow);
+}
+.tile.stock.significant-move .cap .price { font-size: 25px; }
+
+/* 折りたたみ */
+.collapse-toggle {
+  grid-column: 1 / -1;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  border: none;
+  border-radius: var(--tile-radius);
+  padding: 14px;
+  font-family: var(--page-font);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--tile-shadow);
+}
+
+.collapse-section {
+  display: contents;
+}
+.collapse-section.is-collapsed {
+  display: none;
+}
+
+@media (min-width: 431px) {
+  .grid, .page-header { max-width: 430px; }
+}

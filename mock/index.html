@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日立デイジェスト(デザイン10パターン比較)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;700&family=M+PLUS+Rounded+1c:wght@700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg, #eef0f2);
+    color: var(--text, #1a1a1a);
+    font-family: var(--page-font, "Hiragino Sans","Noto Sans JP","Yu Gothic","Meiryo",system-ui,-apple-system,sans-serif);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 0 0 60px;
+    transition: background .2s ease, color .2s ease;
+  }
+
+  /* ---------- pattern switcher ---------- */
+  .switcher{
+    position: sticky;
+    top:0;
+    z-index: 50;
+    width:100%;
+    background: rgba(20,20,20,.92);
+    backdrop-filter: blur(6px);
+    padding: 10px 0;
+    overflow-x:auto;
+    white-space:nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .switcher::-webkit-scrollbar{ display:none; }
+  .switcher .row{ display:inline-flex; gap:8px; padding: 0 12px; }
+  .switcher button{
+    flex:none;
+    border:1px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.08);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    padding: 8px 12px;
+    border-radius: 999px;
+    cursor:pointer;
+    font-family: system-ui,sans-serif;
+  }
+  .switcher button.active{
+    background:#fff;
+    color:#111;
+    border-color:#fff;
+  }
+
+  .phone{ width:100%; max-width: 430px; }
+
+  .notice{
+    max-width: 430px;
+    margin: 14px auto 10px;
+    padding: 8px 14px;
+    background: #fff3cd;
+    color: #6b5300;
+    font-size: 11.5px;
+    line-height:1.6;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #f0d78a;
+  }
+
+  header.app{ padding: 6px 18px 4px; }
+  header.app .row{ display:flex; align-items:baseline; justify-content:space-between; }
+  header.app .logo{ font-size: 21px; font-weight: 800; letter-spacing: .3px; }
+  header.app .logo span{ color: var(--accent, #d81f26); }
+  header.app .updated{ font-size: 11px; opacity:.65; }
+
+  /* ---------- grid: 2 columns max ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 176px;
+    grid-auto-flow: dense;
+    gap: 7px;
+    padding: 10px 7px 0;
+  }
+
+  .tile{
+    position: relative;
+    overflow: hidden;
+    display:flex;
+    align-items:flex-end;
+    cursor: pointer;
+    color: #fff;
+    border-radius: var(--tile-radius, 16px);
+    border: var(--tile-border, none);
+    box-shadow: var(--tile-shadow, 0 6px 18px rgba(0,0,0,.10));
+    transition: transform .15s ease, opacity .2s ease, filter .2s ease;
+  }
+  .tile:active{ transform: scale(.97); }
+
+  .tile.big  { grid-column: span 2; grid-row: span 2; }
+  .tile.wide { grid-column: span 2; grid-row: span 1; }
+  .tile.tall { grid-column: span 1; grid-row: span 2; }
+  .tile.sq   { grid-column: span 1; grid-row: span 1; }
+
+  .tile .bg{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    z-index:0;
+  }
+  .tile .bg.photo{ filter: var(--img-filter, none); }
+
+  .tile::before{
+    content:"";
+    position:absolute; inset:0;
+    background: var(--overlay-grad, linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.15) 45%, rgba(0,0,0,0) 65%));
+    z-index:1;
+    pointer-events:none;
+  }
+
+  /* seen / unseen state */
+  .tile.is-seen{ filter: grayscale(.55) brightness(.8); opacity:.62; }
+  .tile .new-chip{
+    position:absolute; top:10px; right:10px; z-index:3;
+    background: var(--accent, #d81f26);
+    color: var(--new-chip-text, #fff);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing:.03em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+
+  .tile .badge{
+    position:absolute; top:10px; left:10px; z-index:2;
+    font-size: var(--badge-size, 11px);
+    padding: 4px 9px;
+    border-radius: var(--badge-radius, 999px);
+    background: var(--badge-bg, rgba(0,0,0,.55));
+    color: var(--badge-text, #fff);
+    font-weight: var(--badge-weight, 700);
+    letter-spacing: var(--badge-ls, 0);
+    text-transform: var(--badge-tt, none);
+    border: var(--badge-border, none);
+    display:flex; align-items:center; gap:4px;
+  }
+
+  .tile .cap{
+    position:relative; z-index:2;
+    padding: 12px;
+    width:100%;
+    font-family: var(--cap-font, inherit);
+    font-weight: var(--cap-weight, 700);
+    letter-spacing: var(--cap-ls, 0);
+    text-transform: var(--cap-tt, none);
+    line-height: 1.4;
+    font-size:14px;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+  }
+  .tile.big  .cap{ font-size: 18px; -webkit-line-clamp: 5; }
+  .tile.wide .cap{ font-size: 15px; -webkit-line-clamp: 2; }
+  .tile.tall .cap{ font-size: 15px; -webkit-line-clamp: 7; }
+
+  /* stock tile: same visual language, but SQUARE, own chart layer (not affected by photo filter) */
+  .tile.stock .stock-chart{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .tile.stock .cap{ display:flex; flex-direction:column; gap:2px; }
+  .tile.stock .cap .name{ font-size:11.5px; font-weight:700; opacity:.85; }
+  .tile.stock .cap .price{ font-size:20px; font-weight:800; }
+  .tile.stock .cap .chg{ font-size:12.5px; font-weight:800; }
+  .tile.stock .cap .chg.up{ color:#7CFFA0; }
+  .tile.stock .cap .chg.down{ color:#FF9B9B; }
+
+  .loadmore{
+    display:block;
+    width: calc(100% - 34px);
+    margin: 18px auto 4px;
+    padding: 13px;
+    border: var(--tile-border, none);
+    border-radius: var(--tile-radius, 14px);
+    background: var(--badge-bg, #ffffff);
+    color: var(--badge-text, #666);
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: var(--tile-shadow, 0 4px 14px rgba(0,0,0,.08));
+    cursor: pointer;
+    opacity:.85;
+  }
+
+  footer{
+    text-align:center;
+    font-size: 11px;
+    opacity:.6;
+    margin-top: 16px;
+    padding: 0 20px;
+    line-height:1.7;
+  }
+
+  /* =========================================================
+     10 taste patterns — token overrides only, same markup
+     ========================================================= */
+
+  /* ① ミニマル・モノクロ */
+  body[data-pattern="1"]{
+    --bg:#f2f2f0; --text:#111; --page-font:"Hiragino Sans","Noto Sans JP",sans-serif;
+    --tile-radius:6px; --tile-border:1px solid #161616; --tile-shadow:none;
+    --overlay-grad:linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,0) 58%);
+    --badge-radius:3px; --badge-bg:#161616; --badge-text:#fff; --badge-weight:700; --badge-ls:.04em; --badge-tt:uppercase; --badge-size:10px;
+    --cap-font:"Hiragino Sans","Helvetica Neue",sans-serif; --cap-weight:700; --cap-ls:0;
+    --img-filter:grayscale(1) contrast(1.08);
+    --accent:#e11d2e; --new-chip-text:#fff;
+  }
+
+  /* ② エディトリアル/雑誌風 */
+  body[data-pattern="2"]{
+    --bg:#f7f1e6; --text:#2b2620; --page-font:"Noto Serif JP",serif;
+    --tile-radius:2px; --tile-border:none; --tile-shadow:0 1px 0 rgba(0,0,0,.18);
+    --overlay-grad:linear-gradient(to top, rgba(22,16,10,.78), rgba(22,16,10,0) 55%);
+    --badge-radius:0; --badge-bg:transparent; --badge-text:#c9a15a; --badge-weight:600; --badge-ls:.14em; --badge-tt:uppercase; --badge-border:none; --badge-size:10.5px;
+    --cap-font:"Noto Serif JP",Georgia,serif; --cap-weight:700; --cap-ls:.01em;
+    --img-filter:sepia(.4) contrast(1.05) brightness(.88);
+    --accent:#8a3b3b; --new-chip-text:#fff;
+  }
+
+  /* ③ ネオン・ビビッド */
+  body[data-pattern="3"]{
+    --bg:#0b0410; --text:#f5f0ff; --page-font:"Poppins","Hiragino Sans",sans-serif;
+    --tile-radius:22px; --tile-border:none; --tile-shadow:0 0 26px rgba(255,60,220,.28);
+    --overlay-grad:linear-gradient(to top, rgba(25,0,45,.82), rgba(25,0,45,0) 60%);
+    --badge-radius:999px; --badge-bg:linear-gradient(90deg,#ff3cc7,#ff8a3c); --badge-text:#fff; --badge-weight:800; --badge-size:10.5px;
+    --cap-font:"Poppins","Hiragino Sans",sans-serif; --cap-weight:800;
+    --img-filter:saturate(1.9) contrast(1.15) hue-rotate(6deg);
+    --accent:#39f0d1; --new-chip-text:#0b0410;
+  }
+  body[data-pattern="3"] .tile .badge{ background: linear-gradient(90deg,#ff3cc7,#ff8a3c); }
+
+  /* ④ グラスモーフィズム */
+  body[data-pattern="4"]{
+    --bg:linear-gradient(135deg,#7c8fff 0%,#c86dd7 45%,#3f2b96 100%);
+    --text:#fff; --page-font:system-ui,sans-serif;
+    --tile-radius:24px; --tile-border:1px solid rgba(255,255,255,.35); --tile-shadow:0 10px 30px rgba(20,10,50,.35);
+    --overlay-grad:linear-gradient(to top, rgba(10,10,35,.6), rgba(10,10,35,0) 55%);
+    --badge-radius:999px; --badge-bg:rgba(255,255,255,.28); --badge-text:#fff; --badge-weight:700; --badge-size:11px;
+    --cap-font:system-ui,sans-serif; --cap-weight:700;
+    --img-filter:saturate(1.1) brightness(.95);
+    --accent:#ffffff; --new-chip-text:#3f2b96;
+  }
+  body[data-pattern="4"]{ background-attachment: fixed; }
+
+  /* ⑤ ニューブルータリズム */
+  body[data-pattern="5"]{
+    --bg:#fff063; --text:#111; --page-font:"Hiragino Sans",sans-serif;
+    --tile-radius:0px; --tile-border:3px solid #111; --tile-shadow:6px 6px 0 #111;
+    --overlay-grad:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 55%);
+    --badge-radius:0; --badge-bg:#fff; --badge-text:#111; --badge-weight:800; --badge-tt:uppercase; --badge-border:2px solid #111; --badge-size:10.5px;
+    --cap-font:"Arial Black","Hiragino Sans",sans-serif; --cap-weight:900;
+    --img-filter:contrast(1.2) saturate(1.3);
+    --accent:#ff5945; --new-chip-text:#111;
+  }
+  body[data-pattern="5"] .new-chip{ border:2px solid #111; }
+
+  /* ⑥ コーポレート(日立ブランド) */
+  body[data-pattern="6"]{
+    --bg:#eef1f5; --text:#12203a; --page-font:"Hiragino Sans","Noto Sans JP",sans-serif;
+    --tile-radius:10px; --tile-border:none; --tile-shadow:0 4px 14px rgba(18,32,58,.14);
+    --overlay-grad:linear-gradient(to top, rgba(8,16,34,.78), rgba(8,16,34,0) 55%);
+    --badge-radius:4px; --badge-bg:#d81f26; --badge-text:#fff; --badge-weight:700; --badge-size:10.5px;
+    --cap-font:"Hiragino Sans","Noto Sans JP",sans-serif; --cap-weight:700;
+    --img-filter:saturate(.9) contrast(1.05) brightness(.95);
+    --accent:#12203a; --new-chip-text:#fff;
+  }
+
+  /* ⑦ ダークプレミアム */
+  body[data-pattern="7"]{
+    --bg:#0a0a0c; --text:#eae3d3; --page-font:"Noto Serif JP",serif;
+    --tile-radius:14px; --tile-border:1px solid rgba(212,175,110,.35); --tile-shadow:0 12px 30px rgba(0,0,0,.6);
+    --overlay-grad:linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,0) 60%);
+    --badge-radius:2px; --badge-bg:transparent; --badge-text:#d4af6e; --badge-weight:600; --badge-ls:.16em; --badge-tt:uppercase; --badge-border:none; --badge-size:10px;
+    --cap-font:"Noto Serif JP",serif; --cap-weight:600; --cap-ls:.02em;
+    --img-filter:grayscale(.6) contrast(1.15) brightness(.8);
+    --accent:#d4af6e; --new-chip-text:#0a0a0c;
+  }
+
+  /* ⑧ パステル・ソフト */
+  body[data-pattern="8"]{
+    --bg:#f3ecff; --text:#4a4458; --page-font:"M PLUS Rounded 1c","Hiragino Sans",sans-serif;
+    --tile-radius:16px; --tile-border:none; --tile-shadow:0 12px 24px rgba(150,130,200,.28);
+    --overlay-grad:linear-gradient(to top, rgba(70,50,95,.58), rgba(70,50,95,0) 55%);
+    --badge-radius:999px; --badge-bg:rgba(255,255,255,.9); --badge-text:#7a5ea8; --badge-weight:700; --badge-size:11px;
+    --cap-font:"M PLUS Rounded 1c","Hiragino Sans",sans-serif; --cap-weight:700;
+    --img-filter:saturate(1.05) brightness(1.05) contrast(.95);
+    --accent:#ff9ecb; --new-chip-text:#4a4458;
+  }
+
+  /* ⑨ ポップ・ステッカー */
+  body[data-pattern="9"]{
+    --bg:#fff6e9; --text:#22232a; --page-font:"M PLUS Rounded 1c",sans-serif;
+    --tile-radius:26px; --tile-border:4px solid #fff; --tile-shadow:0 6px 0 rgba(0,0,0,.18);
+    --overlay-grad:linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 55%);
+    --badge-radius:999px; --badge-bg:#ffd93d; --badge-text:#22232a; --badge-weight:800; --badge-border:2px solid #22232a; --badge-size:11px;
+    --cap-font:"M PLUS Rounded 1c",sans-serif; --cap-weight:800;
+    --img-filter:saturate(1.4) contrast(1.1);
+    --accent:#ff6b6b; --new-chip-text:#fff;
+  }
+
+  /* ⑩ タイポ重視・フラットBento */
+  body[data-pattern="10"]{
+    --bg:#ffffff; --text:#0a0a0a; --page-font:"Hiragino Sans",sans-serif;
+    --tile-radius:18px; --tile-border:1px solid rgba(0,0,0,.06); --tile-shadow:none;
+    --overlay-grad:linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,0) 50%);
+    --badge-radius:8px; --badge-bg:#0a0a0a; --badge-text:#fff; --badge-weight:800; --badge-tt:uppercase; --badge-ls:.03em; --badge-size:10.5px;
+    --cap-font:"Helvetica Neue","Hiragino Sans",sans-serif; --cap-weight:800;
+    --img-filter:saturate(1.25) contrast(.92) brightness(1.05);
+    --accent:#2f6fed; --new-chip-text:#fff;
+  }
+</style>
+</head>
+<body data-pattern="8">
+
+<div class="switcher">
+  <div class="row" id="switcherRow"></div>
+</div>
+
+<div class="notice">※ デザイン確認用モック(10パターン切替可)。ニュース・株価はすべてダミーデータです。<br>色が薄いタイル=閲覧済み/ NEWバッジ付き=未読 を表します。</div>
+
+<div class="phone">
+  <header class="app">
+    <div class="row">
+      <div class="logo">日立<span>デイジェスト</span></div>
+      <div class="updated">最終更新 9/30(水) 7:00</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <div class="tile sq stock is-new">
+      <svg class="stock-chart" viewBox="0 0 210 176" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gUp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#17a34a" stop-opacity=".55"/>
+            <stop offset="100%" stop-color="#17a34a" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect width="210" height="176" fill="#0b1f14"/>
+        <path d="M0,120 20,112 40,118 60,100 80,105 100,85 120,90 140,68 160,72 180,50 210,40 210,176 0,176 Z" fill="url(#gUp)"/>
+        <polyline points="0,120 20,112 40,118 60,100 80,105 100,85 120,90 140,68 160,72 180,50 210,40" fill="none" stroke="#17a34a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">📈 株価</span>
+      <span class="new-chip">NEW</span>
+      <span class="cap">
+        <span class="name">日立製作所(6501)</span>
+        <span class="price">¥3,842</span>
+        <span class="chg up">▲ +2.3%</span>
+      </span>
+    </div>
+
+    <div class="tile sq is-new">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%236b2f8c%22/><stop offset=%22100%25%22 stop-color=%22%232c1240%22/></linearGradient></defs><rect width=%22300%22 height=%22300%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">📊 決算</span>
+      <span class="new-chip">NEW</span>
+      <span class="cap">(ダミー)2026年度上期決算、営業利益は前年比12%増</span>
+    </div>
+
+    <div class="tile big is-new">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%23103a63%22/><stop offset=%22100%25%22 stop-color=%22%230b1f38%22/></linearGradient></defs><rect width=%22400%22 height=%22400%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🔬 技術</span>
+      <span class="new-chip">NEW</span>
+      <span class="cap">(ダミー)次世代量子コンピュータの実証実験に成功したと発表</span>
+    </div>
+
+    <div class="tile sq is-new">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%237a1f2b%22/><stop offset=%22100%25%22 stop-color=%22%233a0e14%22/></linearGradient></defs><rect width=%22300%22 height=%22300%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">👤 人事</span>
+      <span class="new-chip">NEW</span>
+      <span class="cap">(ダミー)新執行役に〇〇氏を選任</span>
+    </div>
+
+    <div class="tile wide is-new">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22250%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%220%22><stop offset=%220%25%22 stop-color=%22%23155e63%22/><stop offset=%22100%25%22 stop-color=%22%230b3236%22/></linearGradient></defs><rect width=%22500%22 height=%22250%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🏭 新製品</span>
+      <span class="new-chip">NEW</span>
+      <span class="cap">(ダミー)北米新工場が稼働開始、EV向け基幹部品を増産</span>
+    </div>
+
+    <!-- ---- 既読(色が薄い) ---- -->
+
+    <div class="tile tall is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22500%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%231f3a80%22/><stop offset=%22100%25%22 stop-color=%22%230e1a40%22/></linearGradient></defs><rect width=%22300%22 height=%22500%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🌏 海外</span>
+      <span class="cap">(ダミー)海外メディアがDX戦略を特集</span>
+    </div>
+
+    <div class="tile sq is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%23205c2e%22/><stop offset=%22100%25%22 stop-color=%22%2210301a%22/></linearGradient></defs><rect width=%22300%22 height=%22300%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🌱 ESG</span>
+      <span class="cap">(ダミー)サステナビリティレポート2026を公開</span>
+    </div>
+
+    <div class="tile wide is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22250%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%220%22><stop offset=%220%25%22 stop-color=%22%23806b1f%22/><stop offset=%22100%25%22 stop-color=%22%233a2f0e%22/></linearGradient></defs><rect width=%22500%22 height=%22250%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🤝 提携</span>
+      <span class="cap">(ダミー)海外通信大手と協業を検討との報道</span>
+    </div>
+
+    <div class="tile sq is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%23555%22/><stop offset=%22100%25%22 stop-color=%22%23222%22/></linearGradient></defs><rect width=%22300%22 height=%22300%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">📅 IR</span>
+      <span class="cap">(ダミー)株主総会の日程を決定</span>
+    </div>
+
+    <div class="tile sq stock is-seen">
+      <svg class="stock-chart" viewBox="0 0 210 176" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gDown" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e11d2e" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#e11d2e" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect width="210" height="176" fill="#22100f"/>
+        <path d="M0,50 20,58 40,55 60,68 80,64 100,80 120,76 140,92 160,88 180,100 210,96 210,176 0,176 Z" fill="url(#gDown)"/>
+        <polyline points="0,50 20,58 40,55 60,68 80,64 100,80 120,76 140,92 160,88 180,100 210,96" fill="none" stroke="#e11d2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">📈 株価</span>
+      <span class="cap">
+        <span class="name">日立製作所(6501)</span>
+        <span class="price">¥3,756</span>
+        <span class="chg down">▼ -0.8%</span>
+      </span>
+    </div>
+
+    <div class="tile sq is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%23394b6b%22/><stop offset=%22100%25%22 stop-color=%22%23151d2e%22/></linearGradient></defs><rect width=%22300%22 height=%22300%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🧭 経営</span>
+      <span class="cap">(ダミー)中期経営計画の見直しを検討</span>
+    </div>
+
+    <div class="tile big is-seen">
+      <div class="bg photo" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%23902020%22/><stop offset=%22100%25%22 stop-color=%22%23400d0d%22/></linearGradient></defs><rect width=%22400%22 height=%22400%22 fill=%22url(%23g)%22/></svg>')"></div>
+      <span class="badge">🚄 受注</span>
+      <span class="cap">(ダミー)次世代鉄道システムを大型受注、総額◯◯億円規模</span>
+    </div>
+
+  </div>
+
+  <button class="loadmore">さらに過去のタイルを読み込む ↓</button>
+
+  <footer>
+    タップすると元のニュースサイトへ遷移します(モックのためリンク先は未設定)
+  </footer>
+</div>
+
+<script>
+  const patterns = [
+    "①モノクロ","②雑誌風","③ネオン","④ガラス","⑤ブルータル",
+    "⑥日立系","⑦ダーク高級","⑧パステル","⑨ポップ","⑩フラット"
+  ];
+  const row = document.getElementById('switcherRow');
+  patterns.forEach((label, idx) => {
+    const n = idx + 1;
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    if(n === 8) btn.classList.add('active');
+    btn.onclick = () => {
+      document.body.setAttribute('data-pattern', n);
+      [...row.children].forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    row.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>

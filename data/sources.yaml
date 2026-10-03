@@ -1,0 +1,38 @@
+# 信頼できる情報源の許可リスト(NFR-64)
+# ここに無いドメインの記事は収集しない。
+# official: 一次情報(日立製作所・グループ会社の公式発信)として扱うドメイン
+# press: 企業発信のプレスリリース配信サービス
+# media: 主要報道機関
+
+official:
+  - hitachi.co.jp
+  - hitachi.com
+
+press:
+  - prtimes.jp
+
+media:
+  - nikkei.com
+  - xtech.nikkei.com
+  - asahi.com
+  - mainichi.jp
+  - yomiuri.co.jp
+  - sankei.com
+  - nhk.or.jp
+  - jiji.com
+  - kyodonews.jp
+  - this.kiji.is
+  - reuters.com
+  - jp.reuters.com
+  - bloomberg.co.jp
+  - toyokeizai.net
+  - diamond.jp
+  - itmedia.co.jp
+  - impress.co.jp
+  - response.jp
+  - jijico.jp
+  - tv-tokyo.co.jp
+  - tv-asahi.co.jp
+  - ntv.co.jp
+  - fnn.jp
+  - jbpress.ismedia.jp
