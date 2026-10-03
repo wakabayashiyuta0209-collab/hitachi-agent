@@ -20,7 +20,7 @@ export async function enrichWithGemini({ title, sourceName, categories }, { apiK
   const prompt =
     `以下のニュース記事の情報から、次のJSON形式で出力してください。記事にない事実を加えないでください。\n\n` +
     `記事タイトル: ${title}\n出典: ${sourceName}\n\n` +
-    `出力形式:\n{"caption": "25文字程度の短い見出し", "category": "${categories.join("|")}のいずれか", "importance": 0から100の整数(日立製作所の株主・従業員にとっての重要度)}`;
+    `出力形式:\n{"caption": "25文字程度の短い見出し", "category": "${categories.join("|")}のいずれか", "importance": 0から100の整数(日立製作所の株主・従業員にとっての重要度), "topicKey": "この記事が扱う出来事を表す10文字以内の短い語句(例:日立OKI ATM合弁)。表現の違う記事でも同じ出来事なら同じtopicKeyにしてください"}`;
 
   const url = `${ENDPOINT}/${model}:generateContent`;
   const body = JSON.stringify({
@@ -83,6 +83,9 @@ export async function enrichWithGemini({ title, sourceName, categories }, { apiK
       typeof parsed.importance !== "number"
     ) {
       return null;
+    }
+    if (typeof parsed.topicKey !== "string" || !parsed.topicKey.trim()) {
+      parsed.topicKey = parsed.caption; // topicKeyが無い場合はcaptionで代用(重複排除の精度は落ちるが継続する)
     }
     return parsed;
   } catch {

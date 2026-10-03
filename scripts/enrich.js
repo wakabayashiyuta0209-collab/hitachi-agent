@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { dedupeArticles } from "./lib/dedupe.js";
+import { dedupeArticles, clusterBySimilarText } from "./lib/dedupe.js";
 import { enrichWithGemini } from "./lib/gemini-client.js";
 
 // 要件6.0の5分類(優先度①が最も重要)。
@@ -61,7 +61,7 @@ export async function enrichArticles(articles, geminiConfig, batchDate, maxArtic
       result = null;
     }
 
-    let caption, categoryLabel, badgeEmoji, importance;
+    let caption, categoryLabel, badgeEmoji, importance, topicKey;
 
     if (result === null) {
       // Gemini APIに到達できなかった場合のフォールバック(通信障害時もNFR-11により処理を継続する)
@@ -69,6 +69,7 @@ export async function enrichArticles(articles, geminiConfig, batchDate, maxArtic
       categoryLabel = FALLBACK_CATEGORY.label;
       badgeEmoji = FALLBACK_CATEGORY.emoji;
       importance = 40;
+      topicKey = article.title;
     } else if (result.category === EXCLUDE_LABEL) {
       // 主題が日立でない、または5分類に当てはまらない記事は収集しない(FR-09)
       continue;
@@ -80,6 +81,7 @@ export async function enrichArticles(articles, geminiConfig, batchDate, maxArtic
         categoryLabel = FALLBACK_CATEGORY.label;
         badgeEmoji = FALLBACK_CATEGORY.emoji;
         importance = 40;
+        topicKey = article.title;
       } else {
         caption = result.caption;
         categoryLabel = categoryDef.label;
@@ -88,6 +90,7 @@ export async function enrichArticles(articles, geminiConfig, batchDate, maxArtic
         // これにより優先度の高い分類は常に優先度の低い分類より大きいスコアになる(FR-04, AC-05)。
         const within = Math.max(0, Math.min(100, result.importance));
         importance = categoryDef.base + Math.round((within / 100) * 19);
+        topicKey = result.topicKey;
       }
     }
 
@@ -104,9 +107,23 @@ export async function enrichArticles(articles, geminiConfig, batchDate, maxArtic
       size: null, // lib/scoring.js で後から決定
       importance,
       isOfficial: article.isOfficial,
+      topicKey,
       stock: null,
     });
   }
 
-  return tiles;
+  // タイトルの文言は違っても、同じ出来事を扱う記事(例:同じ合弁ニュースを
+  // 複数媒体が報じたもの)をGemini判定のtopicKeyでまとめ直す(FR-02)。
+  // isOfficialを優先し、同条件なら重要度が高い方を代表として残す。
+  const byTopic = clusterBySimilarText(
+    tiles,
+    (t) => t.topicKey,
+    (candidate, current) => {
+      if (candidate.isOfficial !== current.isOfficial) return candidate.isOfficial;
+      return candidate.importance > current.importance;
+    },
+    0.5
+  );
+
+  return byTopic.map(({ topicKey, ...tile }) => tile);
 }

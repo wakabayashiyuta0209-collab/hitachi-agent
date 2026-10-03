@@ -23,7 +23,7 @@ export async function sendNotification(newTiles, config) {
     .sort((a, b) => b.importance - a.importance)[0];
 
   const highlightCaption = highlight ? highlight.caption : "株価情報を更新しました";
-  const subject = "本日の日立デイジェストが更新されました";
+  const subject = "「きょうの日立」が更新されました";
   const html = `<p>${escapeHtml(highlightCaption)}</p><p><a href="${escapeHtml(siteUrl || "")}">見る →</a></p>`;
 
   const res = await fetch(RESEND_ENDPOINT, {
@@ -33,7 +33,7 @@ export async function sendNotification(newTiles, config) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: `${fromName || "日立デイジェスト"} <onboarding@resend.dev>`,
+      from: `${fromName || "きょうの日立"} <onboarding@resend.dev>`,
       to: [toEmail],
       subject,
       html,

@@ -65,13 +65,12 @@ function renderStockTile(tile) {
   const arrow = s.direction === "up" ? "▲" : s.direction === "down" ? "▼" : "・";
   const significantClass = s.isSignificantMove ? " significant-move" : "";
 
-  return `<div class="tile ${tile.size} stock ${direction}${significantClass} is-new" data-tile-id="${tile.id}">
+  return `<div class="tile ${tile.size} stock ${direction}${significantClass}">
   <svg class="stock-chart" viewBox="0 0 100 40" preserveAspectRatio="none">
     <path class="area" d="${area}"></path>
     <path class="line" d="${line}"></path>
   </svg>
   <span class="badge">${tile.badgeEmoji} ${escapeHtml(tile.category)}</span>
-  <span class="new-chip">NEW</span>
   <div class="cap">
     <span class="name">${escapeHtml(tile.caption)}</span>
     <span class="price">¥${s.price.toLocaleString("ja-JP")}</span>
