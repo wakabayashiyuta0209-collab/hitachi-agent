@@ -58,7 +58,12 @@ export async function runDaily() {
   console.log(`[run-daily] 開始 batchDate=${batchDate}`);
 
   if (process.env.FORCE_RUN !== "1" && (await isMarketHoliday())) {
-    console.log("[run-daily] 本日は東証休業日のため、更新処理を行わず終了します(FR-20)");
+    console.log("[run-daily] 本日は東証休業日のため、新規収集は行わず終了します(FR-20)");
+    // dist/ はコミット対象外(.gitignore)のため、GitHub Actions実行のたびに
+    // チェックアウトした時点では存在しない。休業日で何も収集しない日でも、
+    // 既存のtiles.jsonからdist/だけは再生成しておく
+    // (CI側のPagesデプロイ手順が、dist/が無いことで失敗するのを防ぐため)。
+    buildSite();
     return [];
   }
 
